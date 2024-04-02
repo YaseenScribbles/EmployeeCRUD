@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    $employees = Employee::paginate(10);
+    $employees = Employee::simplePaginate(10);
     return view('Employees.list',compact('employees'));
 });
 

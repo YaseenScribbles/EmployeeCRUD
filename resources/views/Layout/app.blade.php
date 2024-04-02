@@ -14,16 +14,20 @@
     <header>
         <nav class="navbar bg-light">
             <div class="container-fluid">
-                <span class="navbar-brand mb-0 h1">Employee CRUD</span>
+                <span class="navbar-brand mb-0 h1">
+                    <a href="{{ route('employee.index') }}" class="text-decoration-none">
+                        Employee CRUD
+                    </a>
+                </span>
             </div>
         </nav>
     </header>
     <main>
         @yield('content')
     </main>
-    <footer class="fixed-bottom bg-light">
-        <div class="text-center">
-            Employee CRUD ©️ 2023-24
+    <footer class="fixed-bottom bg-light d-flex justify-content-center align-items-center" style="height: 50px">
+        <div class="fw-bold">
+            Employee CRUD ©️ 2024-25
         </div>
     </footer>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"

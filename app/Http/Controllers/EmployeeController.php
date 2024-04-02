@@ -2,10 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\EmployeesExport;
 use App\Models\Employee;
 use App\Http\Requests\StoreEmployeeRequest;
 use App\Http\Requests\UpdateEmployeeRequest;
+use App\Imports\EmployeesImport;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 
 class EmployeeController extends Controller
 {
@@ -14,7 +19,7 @@ class EmployeeController extends Controller
      */
     public function index()
     {
-        $employees = Employee::paginate(10);
+        $employees = Employee::simplePaginate(10);
         return view('Employees.list', compact('employees'));
     }
 
@@ -76,7 +81,7 @@ class EmployeeController extends Controller
             $photo = $request->file('photo');
             $photo_path = $photo->store('photos', 'public');
             $data['photo'] = $photo_path;
-        }  else {
+        } else {
             unset($data['photo']);
         }
         if ($request->hasFile('resume') && $request->file('resume')->isValid()) {
@@ -101,5 +106,48 @@ class EmployeeController extends Controller
     {
         $employee->delete();
         return redirect()->route('employee.index');
+    }
+
+    public function export()
+    {
+        return Excel::download(new EmployeesExport, 'employees.xlsx');
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls', // Ensure the uploaded file is an Excel file
+        ]);
+
+        try {
+            Excel::import(new EmployeesImport, $request->file('file'));
+
+            return redirect()->route('employee.index');
+        } catch (\Exception $e) {
+            // Handle import errors
+            return redirect()->back()->with('error', 'Error importing employees: ' . $e->getMessage());
+        }
+    }
+
+    public function sample()
+    {
+        $path = Storage::path('public/sample/sample.xlsx');
+        return response()->download($path, 'sample.xlsx');
+    }
+
+    public function search(Request $request)
+    {
+
+        $searchTerm = $request->query('search');
+        try {
+            $employees = Employee::where('firstname', 'like', '%' . $searchTerm . '%')
+                ->orWhere('lastname', 'like', '%' . $searchTerm . '%')
+                ->simplePaginate(10);
+        } catch (\Throwable $th) {
+            Log::error($th->getMessage());
+            $employees = [];
+        }
+
+        return view('Employees.list',compact('employees'));
     }
 }

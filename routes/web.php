@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\EmployeeController;
+use App\Models\Employee;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,7 +16,13 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    $employees = Employee::paginate(10);
+    return view('Employees.list',compact('employees'));
 });
 
 Route::resource('employee',EmployeeController::class);
+Route::get('/employees/export',[EmployeeController::class,'export'])->name('employees.export');
+Route::post('/employees/import',[EmployeeController::class,'import'])->name('employees.import');
+Route::get('/download-sample-file', [EmployeeController::class,'sample'])->name('download.sample');
+Route::get('/employees',[EmployeeController::class,'search'])->name('employees.search');
+

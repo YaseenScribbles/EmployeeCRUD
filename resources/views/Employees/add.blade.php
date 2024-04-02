@@ -2,13 +2,25 @@
 
 @section('content')
     <div class="card m-lg-3">
-        <div class="card-header d-flex">
-            <a href="{{ route('employee.index') }}">
-                <box-icon name='arrow-back'></box-icon>
-            </a>
-            <span class="ms-2">
-                Add Employee
-            </span>
+        <div class="card-header d-flex justify-content-between">
+            <div>
+                <a href="{{ route('employee.index') }}">
+                    <box-icon name='arrow-back'></box-icon>
+                </a>
+                <span class="ms-2">
+                    Add Employee
+                </span>
+            </div>
+
+            <form action="{{ route('employees.import') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="d-flex gap-2">
+                    <a href="{{ route('download.sample') }}">Sample</a>
+                    <input class="form-control d-inline" type="file" name="file" accept=".xlsx,.xls">
+                    <button type="submit" class="btn btn-primary">Import</button>
+                </div>
+            </form>
+
         </div>
         <div class="card-body">
             @if ($errors->any())
